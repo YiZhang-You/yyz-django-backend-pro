@@ -7,7 +7,8 @@
 from rest_framework.viewsets import ModelViewSet
 
 # from .json_response import SuccessResponse, ErrorResponse
-from backend.application.utils.json_response import SuccessResponse, ErrorResponse
+# from application.utils.json_response import SuccessResponse, ErrorResponse
+from containerapp.utils.json_response import SuccessResponse, ErrorResponse
 
 
 class CustomModelViewSet(ModelViewSet):

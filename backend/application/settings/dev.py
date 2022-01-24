@@ -54,6 +54,8 @@ INSTALLED_APPS = [
 
     'containerapp.system',
     'captcha',  # 图片验证码
+    'django_filters',   # 过滤
+
 ]
 
 AUTH_USER_MODEL = 'system.Users'
@@ -277,6 +279,10 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated'  # 默认权限为验证用户
     ],
     # "DEFAULT_THROTTLE_CLASSES": ["containerapp.utils.throttle.RecordThrottle"],  # 限流
+
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',  # 全局配置过滤器
+    ),
 }
 # ================================================= #
 # ****************** simple-jwt配置 ***************** #
@@ -290,7 +296,7 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
     # 设置前缀
     'AUTH_HEADER_TYPES': ('JWT',),
-    'ROTATE_REFRESH_TOKENS': True
+    'ROTATE_REFRESH_TOKENS': True,
 }
 
 # ================================================= #

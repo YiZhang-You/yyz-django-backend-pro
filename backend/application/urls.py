@@ -18,8 +18,6 @@ from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
 
-# from containerapp.system.views.login import LoginView
-# from containerapp.system.views.login import LoginView
 from containerapp.system.views.login import LoginView,CaptchaView
 
 urlpatterns = [
@@ -35,7 +33,7 @@ urlpatterns = [
 
     path('api/system/', include('containerapp.system.urls')),
 
-    path('login/', LoginView.as_view()),  # 修改的登录,得到二个refresh，access
+    path('login/', LoginView.as_view()),  # 修改的登录,得到二个refresh，access(用这个token)
     path('api/captcha/', CaptchaView.as_view()),    # 图片验证码
 
 ]

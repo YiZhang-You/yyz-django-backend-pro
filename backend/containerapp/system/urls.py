@@ -7,8 +7,11 @@
 from django.urls import path, re_path
 from rest_framework import routers
 
+from containerapp.system.views.users import UsersViewSet
+
 system_url = routers.SimpleRouter()
 
+system_url.register(r'user', UsersViewSet, basename="users")
 
 urlpatterns = [
 
