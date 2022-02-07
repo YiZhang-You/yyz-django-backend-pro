@@ -37,13 +37,13 @@ class CaptchaView(APIView):
 
 
 class LoginSerializer(TokenObtainPairSerializer):
-    captcha = serializers.CharField(min_length=4, max_length=4, required=True,
+    captcha = serializers.CharField(min_length=4, max_length=4, required=False,
                                     error_messages={
                                         "max_length": "图片验证码格式错误",
                                         "min_length": "图片验证码格式错误",
                                         "required": "请输入图片验证码"
                                     }, help_text="图片验证码")
-    captcha_key = serializers.CharField(max_length=255, required=True,
+    captcha_key = serializers.CharField(max_length=255, required=False,
                                         error_messages={
                                             "max_length": "格式错误",
                                             "required": "请输入图片验证码"
@@ -60,25 +60,28 @@ class LoginSerializer(TokenObtainPairSerializer):
 
     def validate(self, attrs):
         # 验证码
-        captcha = attrs["captcha"]
-        captcha_key = attrs["captcha_key"]
-        captcha_obj = CaptchaStore.objects.filter(hashkey=captcha_key).first()
-        five_minute_ago = datetime.now() - timedelta(hours=0, minutes=1, seconds=0)  # 大于刷新时间验证码到期
-        if not captcha_obj:
-            raise ValidationError(detail="验证码过期！")
-        if five_minute_ago > captcha_obj.expiration:
-            captcha_obj.delete()
-            raise ValidationError(detail="验证码过期！")
-        else:
-            if str(captcha).lower() == captcha_obj.response:
-                captcha_obj.delete()
-            else:
-                captcha_obj.delete()
-                raise ValidationError(detail="验证码输入错误")
+        # captcha = attrs["captcha"]
+        # captcha_key = attrs["captcha_key"]
+        # captcha_obj = CaptchaStore.objects.filter(hashkey=captcha_key).first()
+        # five_minute_ago = datetime.now() - timedelta(hours=0, minutes=10, seconds=0)  # 大于刷新时间验证码到期
+        # if not captcha_obj:
+        #     raise ValidationError(detail="验证码过期！")
+        # if five_minute_ago > captcha_obj.expiration:
+        #     captcha_obj.delete()
+        #     raise ValidationError(detail="验证码过期！")
+        # else:
+        #     if str(captcha).lower() == captcha_obj.response:
+        #         captcha_obj.delete()
+        #     else:
+        #         captcha_obj.delete()
+        #         raise ValidationError(detail="验证码输入错误")
 
         username = attrs['username']
         password = attrs['password']
         user = Users.objects.filter(Q(username=username)).first()
+        print(user.password,1111)
+        print(password,22)
+        print(user.check_password(password))
         if user and user.check_password(password):  # check_password() 对明文进行加密,并验证
             data = super().validate(attrs)
             refresh = self.get_token(self.user)

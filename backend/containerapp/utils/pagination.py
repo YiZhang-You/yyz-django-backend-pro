@@ -12,8 +12,8 @@ from rest_framework.pagination import PageNumberPagination, LimitOffsetPaginatio
 
 class OrdinaryPageNumberPagination(PageNumberPagination):
     """普通分页"""
-    page_size = 1
-    max_page_size = 1
+    page_size = 10
+    max_page_size = 100
     page_size_query_param = 'size'
     page_query_param = 'page'
 

@@ -17,18 +17,16 @@ class CustomModelViewSet(ModelViewSet):
     统一标准的返回格式;新增,查询,查询单个,修改，局部修改，删除
     """
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        print(queryset, 1)
-        return queryset
-
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        """创建"""
+        data = request.data.copy()
+        serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return SuccessResponse(data=serializer.data)
 
     def list(self, request, *args, **kwargs):
+        """查看"""
         queryset = self.filter_queryset(self.get_queryset())
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -38,6 +36,7 @@ class CustomModelViewSet(ModelViewSet):
         return SuccessResponse(data=serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
+        """查看"""
         try:
             instance = self.get_object()
         except:
@@ -78,9 +77,12 @@ class CustomModelViewSet(ModelViewSet):
         return SuccessResponse(data=serializer.data)
 
     def destroy(self, request, *args, **kwargs):
+        """删除"""
         try:
             instance = self.get_object()
+            print(instance,111)
         except:
             return ErrorResponse(data="找不到删除对象！")
+        print(self.get_object(),222)
         self.perform_destroy(instance)
         return SuccessResponse(data="删除成功！")

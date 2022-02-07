@@ -43,6 +43,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'containerapp.system',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -52,7 +54,6 @@ INSTALLED_APPS = [
 
     'rest_framework',  # DRF
 
-    'containerapp.system',
     'captcha',  # 图片验证码
     'django_filters',   # 过滤
 
@@ -283,6 +284,8 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',  # 全局配置过滤器
     ),
+
+    'DEFAULT_RENDERER_CLASSES': ('rest_framework_csv.renderers.CSVRenderer',)  # 导出
 }
 # ================================================= #
 # ****************** simple-jwt配置 ***************** #
@@ -305,7 +308,7 @@ SIMPLE_JWT = {
 CAPTCHA_STATE = True
 CAPTCHA_IMAGE_SIZE = (160, 60)  # 设置 captcha 图片大小
 CAPTCHA_LENGTH = 4  # 字符个数
-CAPTCHA_TIMEOUT = 1  # 超时(minutes)
+CAPTCHA_TIMEOUT = 10  # 超时(minutes)
 CAPTCHA_OUTPUT_FORMAT = '%(image)s %(text_field)s %(hidden_field)s '
 CAPTCHA_FONT_SIZE = 40  # 字体大小
 CAPTCHA_FOREGROUND_COLOR = '#ffffff'  # 前景色

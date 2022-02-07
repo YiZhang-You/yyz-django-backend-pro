@@ -37,8 +37,8 @@ class Role(CoreModel):
 
 
 class Permission(CoreModel):
-    title = models.CharField(verbose_name='权限名称', max_length=32)
-    value = models.CharField(max_length=64, verbose_name="权限值", help_text="权限值")
+    title = models.CharField(verbose_name='名称', max_length=32)
+    value = models.CharField(max_length=64, verbose_name="权限值")
 
     url = models.CharField(verbose_name='含正则的URL', max_length=128)
     METHOD_CHOICES = (

@@ -37,5 +37,6 @@ urlpatterns = [
     path('api/captcha/', CaptchaView.as_view()),    # 图片验证码
 
 ]
-
+# pbkdf2_sha256$260000$5emisIqcT2zraGgy095LEy$A0uBlnULh6nFyM/gE1fjw1gH8uStHx835wfw9LH79ig=
+# pbkdf2_sha256$260000$flSS8Ddmy7GHmnjejwxptB$4RHS1iWC3sIWLmAte523G+fQKOCffccIzi2jjpU06D4=
 # admin 123456
