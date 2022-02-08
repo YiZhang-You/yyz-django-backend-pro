@@ -6,8 +6,6 @@
 """
 from rest_framework.viewsets import ModelViewSet
 
-# from .json_response import SuccessResponse, ErrorResponse
-# from application.utils.json_response import SuccessResponse, ErrorResponse
 from containerapp.utils.json_response import SuccessResponse, ErrorResponse
 
 
@@ -86,3 +84,4 @@ class CustomModelViewSet(ModelViewSet):
         print(self.get_object(),222)
         self.perform_destroy(instance)
         return SuccessResponse(data="删除成功！")
+

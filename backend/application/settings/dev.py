@@ -285,7 +285,7 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.DjangoFilterBackend',  # 全局配置过滤器
     ),
 
-    'DEFAULT_RENDERER_CLASSES': ('rest_framework_csv.renderers.CSVRenderer',)  # 导出
+    # 'DEFAULT_RENDERER_CLASSES': ('rest_framework_csv.renderers.CSVRenderer',)  # 导出
 }
 # ================================================= #
 # ****************** simple-jwt配置 ***************** #

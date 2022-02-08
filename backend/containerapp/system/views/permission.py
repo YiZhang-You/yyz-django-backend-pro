@@ -3,7 +3,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from containerapp.system.models import Role
+from containerapp.system.models import Permission
 from containerapp.utils.viewset import CustomModelViewSet
 from containerapp.utils.pagination import OrdinaryPageNumberPagination
 
@@ -11,58 +11,55 @@ from containerapp.utils.pagination import OrdinaryPageNumberPagination
 # ================================================= #
 # ****************** 序列化 ***************** #
 # ================================================= #
-class RoleListSerializer(serializers.ModelSerializer):
+class PermissionListSerializer(serializers.ModelSerializer):
     """查看"""
-    status = serializers.CharField(source="get_status_display")
+
+    # status = serializers.CharField(source="get_status_display")
+    method = serializers.CharField(source="get_method_display")
 
     class Meta:
-        model = Role
-        exclude = ["permissions", ]
-        # fields = "__all__"
-
-
-class RoleCreateSerializer(serializers.ModelSerializer):
-    """新增"""
-    title = serializers.CharField(required=True, max_length=80,
-                                  validators=[
-                                      UniqueValidator(queryset=Role.objects.all(), message="角色已存在")],
-                                  )
-
-    class Meta:
-        model = Role
-        exclude = ["permissions", ]
-
-
-class RoleUpdateSerializer(serializers.ModelSerializer):
-    """修改"""
-
-    class Meta:
-        model = Role
+        model = Permission
         fields = "__all__"
 
 
-class RolePartialUpdateSerializer(serializers.ModelSerializer):
+class PermissionCreateSerializer(serializers.ModelSerializer):
+    """新增"""
+
+    class Meta:
+        model = Permission
+        fields = "__all__"
+
+
+class PermissionUpdateSerializer(serializers.ModelSerializer):
+    """修改"""
+
+    class Meta:
+        model = Permission
+        fields = "__all__"
+
+
+class PermissionPartialUpdateSerializer(serializers.ModelSerializer):
     """局部修改"""
 
     class Meta:
-        model = Role
+        model = Permission
         fields = "__all__"
 
 
 # ================================================= #
 # ****************** 过滤器 ***************** #
 # ================================================= #
-class RoleFilter(FilterSet):
+class PermissionFilter(FilterSet):
     class Meta:
-        model = Role
+        model = Permission
         fields = {
             "id": ['exact', 'iexact', 'gt', 'gte', 'lt', 'lte', 'isnull', 'in', 'range'],
-            "sort": ['exact', 'iexact', 'gt', 'gte', 'lt', 'lte', 'isnull', 'in', 'range'],
-            "status": ['exact', 'iexact', 'gt', 'gte', 'lt', 'lte', 'isnull', 'in', 'range'],
-            # "permissions": ['exact', 'iexact', 'gt', 'gte', 'lt', 'lte', 'isnull', 'in', 'range'],
             "title": ['exact', 'iexact', 'contains', 'icontains'],
-            "key": ['exact', 'iexact', 'contains', 'icontains'],
-            "remark": ['exact', 'iexact', 'contains', 'icontains'],
+            "value": ['exact', 'iexact', 'contains', 'icontains'],
+            "url": ['exact', 'iexact', 'contains', 'icontains'],
+            "method": ['exact', 'iexact', 'contains', 'icontains'],
+            "icon": ['exact', 'iexact', 'contains', 'icontains'],
+            "is_menu": ['exact', 'iexact'],
             "create_datetime": ['year', 'month', 'day', 'week_day', 'gt', 'gte', 'lt', 'lte', 'range'],
             "update_datetime": ['year', 'month', 'day', 'week_day', 'gt', 'gte', 'lt', 'lte', 'range'],
         }
@@ -71,10 +68,10 @@ class RoleFilter(FilterSet):
 # ================================================= #
 # *********************** 视图 ********************* #
 # ================================================= #
-class RoleViewSet(CustomModelViewSet):
+class PermissionViewSet(CustomModelViewSet):
     pagination_class = OrdinaryPageNumberPagination
     filter_backends = (DjangoFilterBackend,)  # 导入过滤器
-    filter_class = RoleFilter
+    filter_class = PermissionFilter
 
     def get_project(self):
         try:
@@ -87,20 +84,20 @@ class RoleViewSet(CustomModelViewSet):
         id = self.get_project()
         if self.request.user:
             if id is None:
-                return Role.objects.all()
+                return Permission.objects.all()
             else:
-                return Role.objects.filter(id=id)
+                return Permission.objects.filter(id=id)
         else:
-            return Role.objects.filter().none()
+            return Permission.objects.filter().none()
 
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve', 'destroy']:
-            return RoleListSerializer
+            return PermissionListSerializer
         elif self.action in ['create']:
-            return RoleCreateSerializer
+            return PermissionCreateSerializer
         elif self.action in ['update']:
-            return RoleUpdateSerializer
+            return PermissionUpdateSerializer
         elif self.action in ['partial_update']:
-            return RolePartialUpdateSerializer
+            return PermissionPartialUpdateSerializer
         else:
             return self.http_method_not_allowed(request=self.request)
