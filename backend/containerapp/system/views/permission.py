@@ -109,6 +109,50 @@ class PermissionViewSet(CustomModelViewSet):
         else:
             return self.http_method_not_allowed(request=self.request)
 
+    def permission_tree_select(self, request, *args, **kwargs):
+        """查看"""
+        # queryset = self.filter_queryset(self.get_queryset())
+        queryset = Permission.objects.all()
+        serializer = PermissionListSerializer(data=queryset, many=True)
+        serializer.is_valid()
+        permission_dict = {}
+        menu_list = []
+        for item in serializer.data:
+            id = item.get("id")
+            parent = item.get("parent")
+            if parent == None:
+                permission_dict[id] = {
+                    "id": item.get("id"),
+                    "sort": item.get("sort"),
+                    "title": item.get("title"),
+                    "url": item.get("url"),
+                    "method": item.get("method"),
+                    "icon": item.get("icon"),
+                    "is_menu": item.get("is_menu"),
+                    "parent": item.get("parent"),
+                    "children": []
+                }
+            else:
+                menu_list.append(item)
+
+        for item in menu_list:
+            permission_dict[item.get("parent")]["children"].append({
+                "id": item.get("id"),
+                "sort": item.get("sort"),
+                "title": item.get("title"),
+                "url": item.get("url"),
+                "method": item.get("method"),
+                "icon": item.get("icon"),
+                "is_menu": item.get("is_menu"),
+                "parent": item.get("parent"),
+            })
+        permission_dict = sorted(permission_dict.values(), key=lambda item: item["sort"], reverse=False)  # 外部sort排序
+        for row in permission_dict:
+            children = row.get("children")
+            if children is not None:
+                row["children"] = sorted(children, key=operator.itemgetter('sort'), reverse=True)  # 内部children中的sort排序
+        return SuccessResponse(data=permission_dict)
+
     def web_router(self, request):
         """获取用户使用的权限permission"""
         user = request.user
@@ -128,7 +172,6 @@ class PermissionViewSet(CustomModelViewSet):
         permission_dict = {}
         menu_list = []
         for item in data:
-            print(item)
             id = item.get("permissions__id")
             parent = item.get("permissions__parent")
             if parent == None:
@@ -145,7 +188,6 @@ class PermissionViewSet(CustomModelViewSet):
                 }
             else:
                 menu_list.append(item)
-
         for item in menu_list:
             parent = item.get("permissions__parent")
             permission_dict[parent]["children"].append({
@@ -158,11 +200,9 @@ class PermissionViewSet(CustomModelViewSet):
                 'is_menu': item['permissions__is_menu'],
                 'parent': item['permissions__parent'],
             })
-
         permission_dict = sorted(permission_dict.values(), key=lambda item: item["sort"], reverse=False)  # 外部sort排序
         for row in permission_dict:
             children = row.get("children")
             if children is not None:
-                row["children"] = sorted(children, key=operator.itemgetter('sort'), reverse=True)   # 内部children中的sort排序
+                row["children"] = sorted(children, key=operator.itemgetter('sort'), reverse=True)  # 内部children中的sort排序
         return SuccessResponse(data=permission_dict)
-

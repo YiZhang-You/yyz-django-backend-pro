@@ -20,7 +20,6 @@ class Users(AbstractUser, CoreModel):
         verbose_name_plural = verbose_name
         ordering = ('-create_datetime',)
 
-
 class Role(CoreModel):
     title = models.CharField(max_length=32, verbose_name='角色名称')
     key = models.CharField(max_length=64, verbose_name="权限字符")

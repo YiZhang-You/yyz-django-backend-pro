@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'captcha',  # 图片验证码
     'django_filters',   # 过滤
 
+
 ]
 
 AUTH_USER_MODEL = 'system.Users'

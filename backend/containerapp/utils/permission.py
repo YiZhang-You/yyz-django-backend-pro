@@ -6,7 +6,7 @@
 """
 import re
 
-from rest_framework.permissions import BasePermission
+from rest_framework.permissions import BasePermission, IsAuthenticated
 
 
 def ValidationApi(reqApi, validApi):
@@ -26,7 +26,7 @@ def ValidationApi(reqApi, validApi):
     else:
         return False
 
-class CustomPermission(BasePermission):
+class CustomPermission(IsAuthenticated):
     """自定义权限"""
 
     def has_permission(self, request, view):
@@ -35,23 +35,26 @@ class CustomPermission(BasePermission):
         2. 获取当前用户权限列表 ['/customer/list/','/customer/list/(?P<cid>\\d+)/']
         3. 权限信息匹配
         """
-        return True
+        # return True
+        bmd = ["/api/system/permission/web_router/"]  # 白名单
         # 判断是否是超级管理员
-        # if request.user.is_superuser:
-        #     return True
-        # else:
-        #     api = request.path  # 当前请求接口
-        #     method = request.method  # 当前请求方法
-        #     method_list = ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
-        #     method = method_list.index(method)
-        #     if not hasattr(request.user, "role"):
-        #         return False
-        #     url_list = request.user.role.filter(permissions__isnull=False).values(  # 获取当前用户的角色拥有的所有接口
-        #         "permissions__url",
-        #         "permissions__method",
-        #     ).order_by("permissions__id").distinct()
-        #     for item in url_list:
-        #         valid = ValidationApi(api, item.get('permissions__url'))
-        #         if valid and (method == item.get('permissions__method')):
-        #             return True
-        # return False
+        if request.user.is_superuser:
+            return True
+        else:
+            api = request.path  # 当前请求接口
+            method = request.method  # 当前请求方法
+            method_list = ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
+            method = method_list.index(method)
+            if api in bmd:
+                return True
+            if not hasattr(request.user, "role"):
+                return False
+            url_list = request.user.role.filter(permissions__isnull=False).values(  # 获取当前用户的角色拥有的所有接口
+                "permissions__url",
+                "permissions__method",
+            ).order_by("permissions__id").distinct()
+            for item in url_list:
+                valid = ValidationApi(api, item.get('permissions__url'))
+                if valid and (method == item.get('permissions__method')):
+                    return True
+        return False

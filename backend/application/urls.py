@@ -15,7 +15,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
+
+from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 
 from containerapp.system.views.login import LoginView, CaptchaView
 from containerapp.system.views.logout import CancellationView
@@ -36,7 +37,7 @@ urlpatterns = [
     path('cancellation/', CancellationView.as_view()),  # 注销
     path('api/captcha/', CaptchaView.as_view()),  # 图片验证码
 
+
 ]
-# pbkdf2_sha256$260000$5emisIqcT2zraGgy095LEy$A0uBlnULh6nFyM/gE1fjw1gH8uStHx835wfw9LH79ig=
-# pbkdf2_sha256$260000$flSS8Ddmy7GHmnjejwxptB$4RHS1iWC3sIWLmAte523G+fQKOCffccIzi2jjpU06D4=
+
 # admin 123456

@@ -145,8 +145,11 @@ class UsersViewSet(CustomModelViewSet):
     def update_user_info(self, request):
         """修改当前用户信息"""
         user = request.user
-        Users.objects.filter(id=user.id).update(**request.data)
-        return SuccessResponse(data=None)
+        user_obj = Users.objects.filter(id=user.id).first()
+        serializers = UsersUpdateSerializer(user_obj,data=request.data.copy(),partial=True)
+        serializers.is_valid(raise_exception=True)
+        serializers.save()
+        return SuccessResponse(data=serializers.data)
 
     def change_password(self, request, *args, **kwargs):
         """密码修改"""

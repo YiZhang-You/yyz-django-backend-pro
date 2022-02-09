@@ -24,6 +24,7 @@ urlpatterns = [
     re_path('user/change_password/(?P<pk>.*?)/', UsersViewSet.as_view({'put': 'change_password'})),  # 用户密码修改
 
     path('permission/web_router/', PermissionViewSet.as_view({'get': 'web_router'})),  # web_router函数的名称
+    path('permission/permission_tree_select/', PermissionViewSet.as_view({'get': 'permission_tree_select'})),  # web_router函数的名称
 
     # re_path('user/export/', UsersViewSet.as_view({'get': 'export'})),
 
