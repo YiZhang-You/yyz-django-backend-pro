@@ -17,8 +17,8 @@ class RoleListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Role
-        exclude = ["permissions", ]
-        # fields = "__all__"
+        # exclude = ["permissions", ]
+        fields = "__all__"
 
 
 class RoleCreateSerializer(serializers.ModelSerializer):

@@ -17,8 +17,8 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
-
-from containerapp.system.views.login import LoginView,CaptchaView
+from containerapp.system.views.login import LoginView, CaptchaView
+from containerapp.system.views.logout import CancellationView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -30,11 +30,11 @@ urlpatterns = [
     # 验证Token的有效性
     path('token/verify/', TokenVerifyView.as_view(), name='token_verify'),
 
-
     path('api/system/', include('containerapp.system.urls')),
 
     path('login/', LoginView.as_view()),  # 修改的登录,得到二个refresh，access(用这个token)
-    path('api/captcha/', CaptchaView.as_view()),    # 图片验证码
+    path('cancellation/', CancellationView.as_view()),  # 注销
+    path('api/captcha/', CaptchaView.as_view()),  # 图片验证码
 
 ]
 # pbkdf2_sha256$260000$5emisIqcT2zraGgy095LEy$A0uBlnULh6nFyM/gE1fjw1gH8uStHx835wfw9LH79ig=

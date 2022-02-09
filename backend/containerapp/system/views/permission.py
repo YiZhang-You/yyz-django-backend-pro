@@ -1,9 +1,12 @@
+import operator
+
 from django_filters import FilterSet
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from containerapp.system.models import Permission
+from containerapp.system.models import Permission, Users, Role
+from containerapp.utils.json_response import SuccessResponse, ErrorResponse
 from containerapp.utils.viewset import CustomModelViewSet
 from containerapp.utils.pagination import OrdinaryPageNumberPagination
 
@@ -14,7 +17,6 @@ from containerapp.utils.pagination import OrdinaryPageNumberPagination
 class PermissionListSerializer(serializers.ModelSerializer):
     """查看"""
 
-    # status = serializers.CharField(source="get_status_display")
     method = serializers.CharField(source="get_method_display")
 
     class Meta:
@@ -28,6 +30,11 @@ class PermissionCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Permission
         fields = "__all__"
+
+    def validate(self, attrs):
+        if attrs["is_menu"]:
+            attrs["parent"] = None
+        return attrs
 
 
 class PermissionUpdateSerializer(serializers.ModelSerializer):
@@ -55,7 +62,7 @@ class PermissionFilter(FilterSet):
         fields = {
             "id": ['exact', 'iexact', 'gt', 'gte', 'lt', 'lte', 'isnull', 'in', 'range'],
             "title": ['exact', 'iexact', 'contains', 'icontains'],
-            "value": ['exact', 'iexact', 'contains', 'icontains'],
+            "sort": ['exact', 'iexact', 'contains', 'icontains'],
             "url": ['exact', 'iexact', 'contains', 'icontains'],
             "method": ['exact', 'iexact', 'contains', 'icontains'],
             "icon": ['exact', 'iexact', 'contains', 'icontains'],
@@ -101,3 +108,61 @@ class PermissionViewSet(CustomModelViewSet):
             return PermissionPartialUpdateSerializer
         else:
             return self.http_method_not_allowed(request=self.request)
+
+    def web_router(self, request):
+        """获取用户使用的权限permission"""
+        user = request.user
+        # 当前用户所有权限
+        data = user.role.filter(permissions__isnull=False).values(
+            "permissions__id",
+            "permissions__title",
+            "permissions__sort",
+            "permissions__url",
+            "permissions__method",
+            "permissions__icon",
+            "permissions__is_menu",
+            "permissions__parent",
+        ).order_by("permissions__id").distinct()
+        if not data:
+            return ErrorResponse(data="用户没有可访问任何权限！")
+        permission_dict = {}
+        menu_list = []
+        for item in data:
+            print(item)
+            id = item.get("permissions__id")
+            parent = item.get("permissions__parent")
+            if parent == None:
+                permission_dict[id] = {
+                    'id': item['permissions__id'],
+                    'sort': item['permissions__sort'],
+                    'title': item['permissions__title'],
+                    'url': item['permissions__url'],
+                    'method': item['permissions__method'],
+                    'icon': item['permissions__icon'],
+                    'is_menu': item['permissions__is_menu'],
+                    'parent': item['permissions__parent'],
+                    'children': []
+                }
+            else:
+                menu_list.append(item)
+
+        for item in menu_list:
+            parent = item.get("permissions__parent")
+            permission_dict[parent]["children"].append({
+                'id': item['permissions__id'],
+                'sort': item['permissions__sort'],
+                'title': item['permissions__title'],
+                'url': item['permissions__url'],
+                'method': item['permissions__method'],
+                'icon': item['permissions__icon'],
+                'is_menu': item['permissions__is_menu'],
+                'parent': item['permissions__parent'],
+            })
+
+        permission_dict = sorted(permission_dict.values(), key=lambda item: item["sort"], reverse=False)  # 外部sort排序
+        for row in permission_dict:
+            children = row.get("children")
+            if children is not None:
+                row["children"] = sorted(children, key=operator.itemgetter('sort'), reverse=True)   # 内部children中的sort排序
+        return SuccessResponse(data=permission_dict)
+

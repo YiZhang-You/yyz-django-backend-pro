@@ -38,8 +38,7 @@ class Role(CoreModel):
 
 class Permission(CoreModel):
     title = models.CharField(max_length=32, verbose_name='名称')
-    value = models.CharField(max_length=64, verbose_name="权限值")
-
+    sort = models.IntegerField(default=1, verbose_name="权限排序")
     url = models.CharField(max_length=128, verbose_name='含正则的URL')
     METHOD_CHOICES = (
         (0, "GET"),
@@ -52,6 +51,8 @@ class Permission(CoreModel):
     method = models.IntegerField(choices=METHOD_CHOICES, verbose_name="接口请求方法")
     icon = models.CharField(max_length=32, null=True, blank=True, verbose_name="菜单设置图标")
     is_menu = models.BooleanField(default=False, verbose_name='是否是菜单')
+    parent = models.ForeignKey(to='self', null=True, blank=True, related_name='parents', verbose_name='关联的权限',
+                               on_delete=models.CASCADE)  # 一个菜单下面有几个,只有is_menu=True，parent都为none
 
     class Meta:
         db_table = "system_permission"

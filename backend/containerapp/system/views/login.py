@@ -79,9 +79,6 @@ class LoginSerializer(TokenObtainPairSerializer):
         username = attrs['username']
         password = attrs['password']
         user = Users.objects.filter(Q(username=username)).first()
-        print(user.password,1111)
-        print(password,22)
-        print(user.check_password(password))
         if user and user.check_password(password):  # check_password() 对明文进行加密,并验证
             data = super().validate(attrs)
             refresh = self.get_token(self.user)

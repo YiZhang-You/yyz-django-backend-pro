@@ -1,9 +1,12 @@
+import time
+
 from django_filters import FilterSet
 from rest_framework import serializers
 from django.contrib.auth.hashers import make_password
 from django_filters.rest_framework import DjangoFilterBackend
 
 from containerapp.system.models import Users
+from containerapp.utils.json_response import ErrorResponse, SuccessResponse
 from containerapp.utils.viewset import CustomModelViewSet
 from containerapp.utils.pagination import OrdinaryPageNumberPagination
 
@@ -15,9 +18,11 @@ class UsersListSerializer(serializers.ModelSerializer):
     """查看"""
     gender = serializers.CharField(source="get_gender_display")
 
+    # role = serializers.CharField(source="role.title",many=True)
     class Meta:
         model = Users
-        exclude = ["password", "role", "user_permissions", "groups", "date_joined", "is_superuser"]
+        fields = "__all__"
+        # exclude = ["password", "user_permissions", "groups", "date_joined", "is_superuser"]
         read_only_fields = ['id', 'update_datetime', 'create_datetime', ]
 
 
@@ -29,7 +34,7 @@ class UsersCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Users
-        exclude = ["role", "user_permissions", "groups", "is_superuser"]
+        fields = "__all__"
         read_only_fields = ['id', 'update_datetime', 'create_datetime', ]
 
     def validate_password(self, value):
@@ -41,7 +46,7 @@ class UsersUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Users
-        exclude = ["role", "user_permissions", "groups", "is_superuser"]
+        fields = "__all__"
         read_only_fields = ['id', 'update_datetime', 'create_datetime', ]
 
 
@@ -50,16 +55,7 @@ class UsersPartialUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Users
-        exclude = ["role", "user_permissions", "groups", "is_superuser"]
-        read_only_fields = ['id', 'update_datetime', 'create_datetime', ]
-
-
-class FileRenderSerializer(serializers.ModelSerializer):
-    """局部修改"""
-
-    class Meta:
-        model = Users
-        exclude = ["role", "user_permissions", "groups", "is_superuser"]
+        fields = "__all__"
         read_only_fields = ['id', 'update_datetime', 'create_datetime', ]
 
 
@@ -132,3 +128,43 @@ class UsersViewSet(CustomModelViewSet):
             return UsersPartialUpdateSerializer
         else:
             return self.http_method_not_allowed(request=self.request)
+
+    def user_info(self, request):
+        """获取当前用户信息"""
+        user = request.user
+        data = {
+            "name": user.name,
+            "username": user.username,
+            "mobile": user.mobile,
+            "avatar": user.avatar,
+            "gender": user.gender,
+            "email": user.email,
+        }
+        return SuccessResponse(data=data)
+
+    def update_user_info(self, request):
+        """修改当前用户信息"""
+        user = request.user
+        Users.objects.filter(id=user.id).update(**request.data)
+        return SuccessResponse(data=None)
+
+    def change_password(self, request, *args, **kwargs):
+        """密码修改"""
+        instance = Users.objects.filter(id=kwargs.get('pk')).first()
+        data = request.data
+        old_pwd = data.get('oldPassword')
+        new_pwd = data.get('newPassword')
+        new_pwd2 = data.get('newPassword2')
+        if instance:
+            if new_pwd != new_pwd2:
+                return ErrorResponse(data="两次密码不匹配")
+            if old_pwd == new_pwd:
+                return ErrorResponse(data="修改密码和原密码一致")
+            elif instance.check_password(old_pwd):
+                instance.password = make_password(new_pwd.encode(encoding="UTF-8"))
+                instance.save()
+                return SuccessResponse(data=None)
+            else:
+                return ErrorResponse(data="旧密码不正确")
+        else:
+            return ErrorResponse(data="未获取到用户")

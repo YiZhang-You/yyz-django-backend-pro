@@ -69,6 +69,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'containerapp.system.middlewares.api_logging_middleware.ApiLoggingMiddleware',  # 操作日志
 ]
 
 ROOT_URLCONF = 'application.urls'
@@ -276,8 +277,10 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication'
     ],
+
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated'  # 默认权限为验证用户
+        # 'rest_framework.permissions.IsAuthenticated'  # 默认权限为验证用户
+        'containerapp.utils.permission.CustomPermission'
     ],
     # "DEFAULT_THROTTLE_CLASSES": ["containerapp.utils.throttle.RecordThrottle"],  # 限流
 
@@ -320,3 +323,5 @@ CAPTCHA_NOISE_FUNCTIONS = (
 )
 CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.random_char_challenge'  # 字母验证码
 # CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'  # 加减乘除验证码
+
+
