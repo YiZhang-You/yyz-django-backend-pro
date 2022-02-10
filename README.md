@@ -1,38 +1,101 @@
-# yyz-django-backend-pro
+# 1、拉取项目
 
-#### 介绍
-yyz-django-backend-pro 是模仿django-vue-admin写的一套后台二级权限的代码，具有统一返回格式，集成了drf的一些功能：简单登录、权限、限流、分页、异常、视图等。适合开发简单项目，节省了搭建项目的时间。（只有接口）https://www.apizza.net/project/9b2603cc9d479f649f35cc330efdb0be/browse
-密码在md
+新建一个文件夹使用git拉取
 
-#### 软件架构
-软件架构说明
+```
+git clone https://gitee.com/yyzlt/yyz-django-backend-pro.git
+```
+
+# 2、配置
+
+找到settings,中的dev（开发）.和prod（生产）【部署修改的时候在manage.py中换成application.settings.prod】
+
+## 2.1 配置数据库
+
+```python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',  # 数据库引擎
+        'HOST': '127.0.0.1',  # 数据库主机
+        'PORT': 3306,  # 数据库端口
+        'USER': 'root',  # 数据库用户名
+        'PASSWORD': 'mysql',  # 数据库用户密码
+        'NAME': 'backend_pro'  # 数据库名字
+    },
+}
+```
+
+## 2.2 配置redis
+
+```python
+# redis
+CACHES = {
+    "default": {  # 默认
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/15",
+        "OPTIONS": {
+            "PASSWORD": "",
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    },
+    "session": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/14",
+        "OPTIONS": {
+            "PASSWORD": "",
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    },
+    "access_record": {  # 访问记录
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/2",
+        "OPTIONS": {
+            "PASSWORD": "",
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    },
+}
+```
+
+# 3、迁移文件
+
+```python
+python manage.py makemigrations
+python manage.py migrate
+python manage.py init_data  # 初始化数据
+```
 
 
-#### 安装教程
-1
-1.  xxxx
-2.  xxxx
-3.  xxxx
 
-#### 使用说明
+# 4、测试
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+```
+http://127.0.0.1:8000/doc/
+http://127.0.0.1:8000/redoc/
 
-#### 参与贡献
-
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+https://www.apizza.net/project/9b2603cc9d479f649f35cc330efdb0be/browse
+密码：123456
+```
 
 
-#### 特技
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+# 5、报错解决
+
+## 5.1 项目导包路径报红色，
+
+选择根目录backend右键--》Mark Directory as -->第一个
+
+```
+https://blog.csdn.net/qq_30622831/article/details/80978118
+```
+
+## 5.2 使用django_filters报AttributeError: 'list' object has no attribute 'split'
+
+改下载的django_filters中的widgets.py中的213行
+
+```python
+return value.split(',')
+# return str(value).split(',')  # 把列表改成字符串，因为是版本的原因
+```
+
+## 5.3 访问接口文档的时候报错（未解决）
