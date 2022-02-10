@@ -2,7 +2,7 @@
 @author: 游益章
 @contact: WX:largestrongyyz QQ:1246268651
 @Created on: 2022/1/20 10:07
-@Remark: 路由文件
+@Remark: 路由文件（如果要加入更好的批量操作用pip install djangorestframework-bulk）
 """
 from django.urls import path, re_path
 from rest_framework import routers
@@ -24,11 +24,7 @@ urlpatterns = [
     re_path('user/change_password/(?P<pk>.*?)/', UsersViewSet.as_view({'put': 'change_password'})),  # 用户密码修改
 
     path('permission/web_router/', PermissionViewSet.as_view({'get': 'web_router'})),  # web_router函数的名称
-    path('permission/permission_tree_select/', PermissionViewSet.as_view({'get': 'permission_tree_select'})),  # web_router函数的名称
-
-    # re_path('user/export/', UsersViewSet.as_view({'get': 'export'})),
-
-    # path(r'file/', RoleDownloadView.as_view({"get": "list"}), name="stafffiledownload"),
+    path('permission/permission_tree_select/', PermissionViewSet.as_view({'get': 'permission_tree_select'})),
 
 ]
 urlpatterns += system_url.urls

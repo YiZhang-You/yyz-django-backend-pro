@@ -6,7 +6,9 @@
 """
 import re
 
-from rest_framework.permissions import BasePermission, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
+
+from application.settings.dev import WHITELIST
 
 
 def ValidationApi(reqApi, validApi):
@@ -26,6 +28,7 @@ def ValidationApi(reqApi, validApi):
     else:
         return False
 
+
 class CustomPermission(IsAuthenticated):
     """自定义权限"""
 
@@ -36,7 +39,6 @@ class CustomPermission(IsAuthenticated):
         3. 权限信息匹配
         """
         # return True
-        bmd = ["/api/system/permission/web_router/"]  # 白名单
         # 判断是否是超级管理员
         if request.user.is_superuser:
             return True
@@ -45,7 +47,7 @@ class CustomPermission(IsAuthenticated):
             method = request.method  # 当前请求方法
             method_list = ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
             method = method_list.index(method)
-            if api in bmd:
+            if api in WHITELIST and int(request.user.is_active) == 1:
                 return True
             if not hasattr(request.user, "role"):
                 return False

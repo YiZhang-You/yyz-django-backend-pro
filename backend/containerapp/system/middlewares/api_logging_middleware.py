@@ -4,6 +4,7 @@
 @Created on: 2022/2/9 15:25
 @Remark: 记录日志
 """
+from django.contrib.auth.models import AnonymousUser
 from django.utils.deprecation import MiddlewareMixin
 
 from containerapp.system.models import OperationLog, Permission
@@ -19,6 +20,8 @@ class ApiLoggingMiddleware(MiddlewareMixin):
     def __init__(self, get_response=None):
         super().__init__(get_response)
         self.operation_log_id = None
+        self.content = None
+        self.message = None
 
     def process_request(self, request):
         request.request_ip = get_request_ip(request)  # 获取ip
@@ -27,26 +30,32 @@ class ApiLoggingMiddleware(MiddlewareMixin):
 
     def process_response(self, request, response):
         body = getattr(request, 'request_data', {})
-        if isinstance(body, dict) and body.get('password', ''):  # 将请求数据变成*
+        if isinstance(body, dict) and body.get('password', ''):  # 将请求密码变成*
             body['password'] = '*' * len(body['password'])
-        user = get_request_user(request)
+        get_request_user(request)
         method_list = ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
         modular = Permission.objects.filter(method=method_list.index(request.method), url=request.request_path).first()
+        user = get_request_user(request)
+        try:
+            self.content = response.data.get("code")
+            self.message = response.data.get("message")
+        except:
+            self.content = 0
+            self.message = "服务器错误！"
+
         info = {
             'request_path': request.request_path,
             'request_body': body,
             'request_method': request.method,
             'request_ip': request.request_ip,
             'request_browser': get_browser(request),
-            # 'response_code': response.data.get('code'),
-            'response_code': "1",
+            'response_code': self.content,
+            "user": user if not isinstance(user, AnonymousUser) else None,
             'request_os': get_os(request),
             "request_modular": modular.title if modular else "*",
             'request_msg': request.session.get('request_msg'),
-            # 'status': True if response.data.get('code') in [1, ] else False,
-            'status': True,
-            # 'json_result': {"code": response.data.get('code'), "msg": response.data.get('msg')},
-            'json_result': 0,
+            'status': True if self.content in [1, ] else False,
+            'json_result': {"code": self.content, "message": self.message},
         }
 
         OperationLog.objects.update_or_create(defaults=info, id=self.operation_log_id)

@@ -43,20 +43,17 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'containerapp.system',
-
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
+    'containerapp.system',
     'rest_framework',  # DRF
-
     'captcha',  # 图片验证码
-    'django_filters',   # 过滤
-
+    'django_filters',  # 过滤
+    'drf_yasg',
 
 ]
 
@@ -283,13 +280,11 @@ REST_FRAMEWORK = {
         # 'rest_framework.permissions.IsAuthenticated'  # 默认权限为验证用户
         'containerapp.utils.permission.CustomPermission'
     ],
-    # "DEFAULT_THROTTLE_CLASSES": ["containerapp.utils.throttle.RecordThrottle"],  # 限流
-
+    "DEFAULT_THROTTLE_CLASSES": ["containerapp.utils.throttle.RecordThrottle"],  # 限流
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',  # 全局配置过滤器
     ),
 
-    # 'DEFAULT_RENDERER_CLASSES': ('rest_framework_csv.renderers.CSVRenderer',)  # 导出
 }
 # ================================================= #
 # ****************** simple-jwt配置 ***************** #
@@ -326,3 +321,42 @@ CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.random_char_challenge'  # 字母验�
 # CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'  # 加减乘除验证码
 
 
+# ====================================#
+# ****************swagger************#
+# ====================================#
+SWAGGER_SETTINGS = {
+    # 基础样式
+    'SECURITY_DEFINITIONS': {
+        "basic": {
+            # 'type': 'basic'
+            'type': 'JWT'
+        }
+    },
+    # 如果需要登录才能够查看接口文档, 登录的链接使用restframework自带的.
+
+    'LOGIN_URL': 'apiLogin/',
+    # 'LOGIN_URL': 'rest_framework:login',
+    'LOGOUT_URL': 'rest_framework:logout',
+    # 'DOC_EXPANSION': None,
+    # 'SHOW_REQUEST_HEADERS':True,
+    # 'USE_SESSION_AUTH': True,
+    # 'DOC_EXPANSION': 'list',
+    # 接口文档中方法列表以首字母升序排列
+    'APIS_SORTER': 'alpha',
+    # 如果支持json提交, 则接口文档中包含json输入框
+    'JSON_EDITOR': True,
+    # 方法列表字母排序
+    'OPERATIONS_SORTER': 'alpha',
+    'VALIDATOR_URL': None,
+    'AUTO_SCHEMA_TYPE': 2,  # 分组根据url层级分，0、1 或 2 层
+    'DEFAULT_AUTO_SCHEMA_CLASS': 'containerapp.utils.swagger.CustomSwaggerAutoSchema',
+}
+
+# ================================================= #
+# ******************** 其他配置 ******************** #
+# ================================================= #
+INTERVALTIME = 60  # 间隔时间
+FREQUENCY = 20  # 限流规定时间访问多少次
+WHITELIST = ["/api/system/permission/web_router/", "/api/system/permission/web_router/",
+             "/api/system/user/change_password/{id}/", "/api/system/user/update_user_info/",
+             "/api/system/user/user_info/"]  # 白名单

@@ -1,18 +1,17 @@
 import operator
 
 from django_filters import FilterSet
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator
+from django_filters.rest_framework import DjangoFilterBackend
 
-from containerapp.system.models import Permission, Users, Role
-from containerapp.utils.json_response import SuccessResponse, ErrorResponse
-from containerapp.utils.viewset import CustomModelViewSet
+from containerapp.system.models import Permission
+from containerapp.utils.viewset import CustomMultipleModelViewSet
 from containerapp.utils.pagination import OrdinaryPageNumberPagination
+from containerapp.utils.json_response import SuccessResponse, ErrorResponse
 
 
 # ================================================= #
-# ****************** 序列化 ***************** #
+# ********************* 序列化 ******************** #
 # ================================================= #
 class PermissionListSerializer(serializers.ModelSerializer):
     """查看"""
@@ -54,7 +53,7 @@ class PermissionPartialUpdateSerializer(serializers.ModelSerializer):
 
 
 # ================================================= #
-# ****************** 过滤器 ***************** #
+# ********************* 过滤器 ******************** #
 # ================================================= #
 class PermissionFilter(FilterSet):
     class Meta:
@@ -73,12 +72,15 @@ class PermissionFilter(FilterSet):
 
 
 # ================================================= #
-# *********************** 视图 ********************* #
+# *********************** 视图 ******************** #
 # ================================================= #
-class PermissionViewSet(CustomModelViewSet):
+class PermissionViewSet(CustomMultipleModelViewSet):
     pagination_class = OrdinaryPageNumberPagination
     filter_backends = (DjangoFilterBackend,)  # 导入过滤器
     filter_class = PermissionFilter
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(Permission, PermissionUpdateSerializer)  # 使用批量操作的时候用
 
     def get_project(self):
         try:
@@ -111,7 +113,6 @@ class PermissionViewSet(CustomModelViewSet):
 
     def permission_tree_select(self, request, *args, **kwargs):
         """查看"""
-        # queryset = self.filter_queryset(self.get_queryset())
         queryset = Permission.objects.all()
         serializer = PermissionListSerializer(data=queryset, many=True)
         serializer.is_valid()

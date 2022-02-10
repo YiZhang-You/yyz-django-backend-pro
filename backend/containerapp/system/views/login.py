@@ -25,7 +25,6 @@ class CaptchaView(APIView):
     """生成图片验证码"""
     authentication_classes = []
     permission_classes = []
-    throttle_classes = [RecordThrottle]
 
     def get(self, request):
         hash_key = CaptchaStore.generate_key()  # 生成hash
@@ -60,21 +59,21 @@ class LoginSerializer(TokenObtainPairSerializer):
 
     def validate(self, attrs):
         # 验证码
-        # captcha = attrs["captcha"]
-        # captcha_key = attrs["captcha_key"]
-        # captcha_obj = CaptchaStore.objects.filter(hashkey=captcha_key).first()
-        # five_minute_ago = datetime.now() - timedelta(hours=0, minutes=10, seconds=0)  # 大于刷新时间验证码到期
-        # if not captcha_obj:
-        #     raise ValidationError(detail="验证码过期！")
-        # if five_minute_ago > captcha_obj.expiration:
-        #     captcha_obj.delete()
-        #     raise ValidationError(detail="验证码过期！")
-        # else:
-        #     if str(captcha).lower() == captcha_obj.response:
-        #         captcha_obj.delete()
-        #     else:
-        #         captcha_obj.delete()
-        #         raise ValidationError(detail="验证码输入错误")
+        captcha = attrs["captcha"]
+        captcha_key = attrs["captcha_key"]
+        captcha_obj = CaptchaStore.objects.filter(hashkey=captcha_key).first()
+        five_minute_ago = datetime.now() - timedelta(hours=0, minutes=10, seconds=0)  # 大于刷新时间验证码到期
+        if not captcha_obj:
+            raise ValidationError(detail="验证码过期！")
+        if five_minute_ago > captcha_obj.expiration:
+            captcha_obj.delete()
+            raise ValidationError(detail="验证码过期！")
+        else:
+            if str(captcha).lower() == captcha_obj.response:
+                captcha_obj.delete()
+            else:
+                captcha_obj.delete()
+                raise ValidationError(detail="验证码输入错误")
 
         username = attrs['username']
         password = attrs['password']

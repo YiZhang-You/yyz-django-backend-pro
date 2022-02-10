@@ -3,12 +3,12 @@ from rest_framework import serializers
 from django_filters.rest_framework import DjangoFilterBackend
 
 from containerapp.system.models import OperationLog
-from containerapp.utils.viewset import CustomModelViewSet
+from containerapp.utils.viewset import ListModelViewSet
 from containerapp.utils.pagination import OrdinaryPageNumberPagination
 
 
 # ================================================= #
-# ****************** 序列化 ***************** #
+# ********************* 序列化 ******************** #
 # ================================================= #
 class OperationLogListSerializer(serializers.ModelSerializer):
     """查看"""
@@ -19,7 +19,7 @@ class OperationLogListSerializer(serializers.ModelSerializer):
 
 
 # ================================================= #
-# ****************** 过滤器 ***************** #
+# ********************* 过滤器 ******************** #
 # ================================================= #
 class OperationLogFilter(FilterSet):
     class Meta:
@@ -43,9 +43,9 @@ class OperationLogFilter(FilterSet):
 
 
 # ================================================= #
-# *********************** 视图 ********************* #
+# *********************** 视图 ******************** #
 # ================================================= #
-class OperationLogViewSet(CustomModelViewSet):
+class OperationLogViewSet(ListModelViewSet):
     pagination_class = OrdinaryPageNumberPagination
     filter_backends = (DjangoFilterBackend,)  # 导入过滤器
     filter_class = OperationLogFilter

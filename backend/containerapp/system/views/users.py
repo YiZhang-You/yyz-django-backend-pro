@@ -1,5 +1,3 @@
-import time
-
 from django_filters import FilterSet
 from rest_framework import serializers
 from django.contrib.auth.hashers import make_password
@@ -18,7 +16,6 @@ class UsersListSerializer(serializers.ModelSerializer):
     """查看"""
     gender = serializers.CharField(source="get_gender_display")
 
-    # role = serializers.CharField(source="role.title",many=True)
     class Meta:
         model = Users
         fields = "__all__"
@@ -146,10 +143,10 @@ class UsersViewSet(CustomModelViewSet):
         """修改当前用户信息"""
         user = request.user
         user_obj = Users.objects.filter(id=user.id).first()
-        serializers = UsersUpdateSerializer(user_obj,data=request.data.copy(),partial=True)
-        serializers.is_valid(raise_exception=True)
-        serializers.save()
-        return SuccessResponse(data=serializers.data)
+        serializer = UsersUpdateSerializer(user_obj, data=request.data.copy(), partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return SuccessResponse(data=serializer.data)
 
     def change_password(self, request, *args, **kwargs):
         """密码修改"""

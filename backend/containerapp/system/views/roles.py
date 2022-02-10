@@ -1,7 +1,7 @@
 from django_filters import FilterSet
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
+from django_filters.rest_framework import DjangoFilterBackend
 
 from containerapp.system.models import Role
 from containerapp.utils.viewset import CustomModelViewSet
@@ -9,7 +9,7 @@ from containerapp.utils.pagination import OrdinaryPageNumberPagination
 
 
 # ================================================= #
-# ****************** 序列化 ***************** #
+# ********************* 序列化 ******************** #
 # ================================================= #
 class RoleListSerializer(serializers.ModelSerializer):
     """查看"""
@@ -50,7 +50,7 @@ class RolePartialUpdateSerializer(serializers.ModelSerializer):
 
 
 # ================================================= #
-# ****************** 过滤器 ***************** #
+# ********************* 过滤器 ******************** #
 # ================================================= #
 class RoleFilter(FilterSet):
     class Meta:
@@ -59,7 +59,6 @@ class RoleFilter(FilterSet):
             "id": ['exact', 'iexact', 'gt', 'gte', 'lt', 'lte', 'isnull', 'in', 'range'],
             "sort": ['exact', 'iexact', 'gt', 'gte', 'lt', 'lte', 'isnull', 'in', 'range'],
             "status": ['exact', 'iexact', 'gt', 'gte', 'lt', 'lte', 'isnull', 'in', 'range'],
-            # "permissions": ['exact', 'iexact', 'gt', 'gte', 'lt', 'lte', 'isnull', 'in', 'range'],
             "title": ['exact', 'iexact', 'contains', 'icontains'],
             "key": ['exact', 'iexact', 'contains', 'icontains'],
             "remark": ['exact', 'iexact', 'contains', 'icontains'],
