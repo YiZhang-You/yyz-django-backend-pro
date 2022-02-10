@@ -1,5 +1,5 @@
 """
-@author: 游益章
+@author: 游YIZHANG
 @contact: WX:largestrongyyz QQ:1246268651
 @Created on: 2022/1/20 10:07
 @Remark: 路由文件（如果要加入更好的批量操作用pip install djangorestframework-bulk）

@@ -1,5 +1,5 @@
 """
-@author: 游益章
+@author: 游YIZHANG
 @contact: WX:largestrongyyz QQ:1246268651
 @Created on: 2022/1/20 10:19
 @Remark: 自定义视图集 CustomMultipleModelViewSet(增删改查批量),CustomModelViewSet(增删改查),ListModelViewSet(查看,查看单个)
